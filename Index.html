@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Para mi Nelsy ❤️</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      /* Custom font for a more romantic feel */
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Pacifico&display=swap");
+
+      body {
+        font-family: "Inter", sans-serif;
+        overflow-x: hidden; /* Prevent horizontal scroll */
+      }
+
+      /* Heart beating animation */
+      @keyframes beat {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+      }
+
+      .heart-beat {
+        animation: beat 1.5s infinite ease-in-out;
+      }
+
+      /* Falling hearts animation */
+      .falling-heart {
+        position: absolute;
+        color: #ff69b4; /* Pink heart color */
+        font-size: 24px;
+        animation: fall linear infinite;
+        pointer-events: none; /* Allow clicks through hearts */
+        z-index: 0; /* Ensure hearts are behind content */
+      }
+
+      @keyframes fall {
+        0% {
+          transform: translateY(-100px) translateX(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(calc(100vh + 100px)) translateX(var(--x-offset));
+          opacity: 0;
+        }
+      }
+
+      /* Modal specific styles */
+      .modal-overlay {
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
+      }
+
+      /* Custom scrollbar for letter content */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f3e8ee;
+        border-radius: 10px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #ff85a2;
+        border-radius: 10px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #ff69b4;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-pink-100 to-purple-200 min-h-screen flex flex-col items-center justify-center text-gray-800"
+  >
+    <!-- Initial Screen -->
+    <div
+      id="initial-screen"
+      class="flex flex-col items-center justify-center p-6 sm:p-8 md:p-10 rounded-3xl shadow-xl bg-white bg-opacity-80 max-w-md w-full mx-4 transition-all duration-700 ease-in-out"
+    >
+      <h1
+        class="text-4xl sm:text-5xl font-pacifico text-pink-600 mb-6 text-center"
+      >
+        ¡Hola, mi amor!
+      </h1>
+      <div
+        id="beatingHeart"
+        class="text-red-500 text-8xl sm:text-9xl mb-8 heart-beat"
+      >
+        ❤️
+      </div>
+      <input
+        type="text"
+        id="nameInput"
+        placeholder="Escribe tu nombre aquí..."
+        class="w-full p-4 mb-6 text-xl rounded-xl border-2 border-pink-300 focus:outline-none focus:ring-4 focus:ring-pink-300 text-center placeholder-pink-400 transition-all duration-300"
+      />
+      <button
+        id="enterBtn"
+        class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-4 px-8 rounded-full text-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+      >
+        Entrar <i class="fas fa-arrow-right ml-2"></i>
+      </button>
+      <p id="errorMessage" class="text-red-600 mt-4 text-lg hidden">
+        Nombre incorrecto. ¡Intenta de nuevo!
+      </p>
+    </div>
+
+    <!-- Main Content -->
+    <div
+      id="main-content"
+      class="hidden flex-col items-center justify-center w-full min-h-screen p-4 sm:p-6 md:p-8 transition-all duration-700 ease-in-out relative z-10"
+    >
+      <!-- Falling Hearts Container -->
+      <div
+        id="fallingHeartsContainer"
+        class="absolute inset-0 overflow-hidden pointer-events-none z-0"
+      ></div>
+
+      <!-- Audio element for background music -->
+      <audio id="backgroundMusic" loop>
+        <!-- Replace 'your-music-file.mp3' with the actual URL of your song -->
+        <source src="assets/musica.mp3" type="audio/mpeg" />
+        Tu navegador no soporta el elemento de audio.
+      </audio>
+
+      <h2
+        class="text-5xl sm:text-6xl font-pacifico text-pink-700 mb-8 text-center drop-shadow-md"
+      >
+        ¡Bienvenida, Nelsy!
+      </h2>
+
+      <!-- Letter Section -->
+      <div
+        class="bg-white bg-opacity-70 p-6 sm:p-8 rounded-3xl shadow-2xl max-w-2xl w-full mb-12 border-4 border-pink-300 transform hover:scale-105 transition-transform duration-300"
+      >
+        <h3
+          class="text-3xl sm:text-4xl font-pacifico text-purple-600 mb-6 text-center"
+        >
+          Una Carta para Ti ❤️
+        </h3>
+        <p class="text-lg text-gray-700 mb-6 leading-relaxed text-center">
+          Aquí hay un mensaje muy especial, escrito solo para ti. ¡Espero que te
+          guste!
+        </p>
+        <button
+          id="openLetterBtn"
+          class="block mx-auto bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+        >
+          Abrir Carta <i class="fas fa-envelope-open-text ml-2"></i>
+        </button>
+      </div>
+
+      <!-- Image Gallery Section - Collage Layout -->
+      <div
+        class="bg-white bg-opacity-70 p-6 sm:p-8 rounded-3xl shadow-2xl max-w-5xl w-full border-4 border-purple-300"
+      >
+        <h3
+          class="text-3xl sm:text-4xl font-pacifico text-pink-600 mb-8 text-center"
+        >
+          Nuestros Momentos Juntos 📸
+        </h3>
+        <div
+          id="imageGallery"
+          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 grid-flow-dense"
+        >
+          <!-- Image placeholders - Replace with your actual image URLs -->
+          <!-- Image 1 -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-pink-200 transform hover:scale-105 transition-transform duration-300 aspect-w-4 aspect-h-3"
+          >
+            <img
+              src="assets/foto1.jpg"
+              alt="Nosotros 1"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/400x300/ffb6c1/ffffff?text=Error+Foto+1'; console.error('Error al cargar foto1.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-pink-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 1</span>
+            </div>
+          </div>
+          <!-- Image 2 - Spans 2 columns on medium screens and up -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-purple-200 transform hover:scale-105 transition-transform duration-300 md:col-span-2 aspect-w-16 aspect-h-9"
+          >
+            <img
+              src="assets/foto2.jpg"
+              alt="Nosotros 2"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/600x337/dda0dd/ffffff?text=Error+Foto+2'; console.error('Error al cargar foto2.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-purple-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 2</span>
+            </div>
+          </div>
+          <!-- Image 3 -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-pink-200 transform hover:scale-105 transition-transform duration-300 aspect-w-4 aspect-h-3"
+          >
+            <img
+              src="assets/foto3.jpg"
+              alt="Nosotros 3"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/400x300/ffb6c1/ffffff?text=Error+Foto+3'; console.error('Error al cargar foto3.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-pink-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 3</span>
+            </div>
+          </div>
+          <!-- Image 4 -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-purple-200 transform hover:scale-105 transition-transform duration-300 aspect-w-4 aspect-h-3"
+          >
+            <img
+              src="assets/foto4.jpg"
+              alt="Nosotros 4"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/400x300/dda0dd/ffffff?text=Error+Foto+4'; console.error('Error al cargar foto4.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-purple-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 4</span>
+            </div>
+          </div>
+          <!-- Image 5 - Spans 2 columns on medium screens and up -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-pink-200 transform hover:scale-105 transition-transform duration-300 md:col-span-2 aspect-w-16 aspect-h-9"
+          >
+            <img
+              src="assets/foto5.jpg"
+              alt="Nosotros 5"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/600x337/ffb6c1/ffffff?text=Error+Foto+5'; console.error('Error al cargar foto5.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-pink-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 5</span>
+            </div>
+          </div>
+          <!-- Image 6 -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-purple-200 transform hover:scale-105 transition-transform duration-300 aspect-w-4 aspect-h-3"
+          >
+            <img
+              src="assets/foto6.jpg"
+              alt="Nosotros 6"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/400x300/dda0dd/ffffff?text=Error+Foto+6'; console.error('Error al cargar foto6.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-purple-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 6</span>
+            </div>
+          </div>
+          <!-- Image 7 -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-pink-200 transform hover:scale-105 transition-transform duration-300 aspect-w-4 aspect-h-3"
+          >
+            <img
+              src="assets/foto7.jpg"
+              alt="Nosotros 7"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/400x300/ffb6c1/ffffff?text=Error+Foto+7'; console.error('Error al cargar foto7.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-pink-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 7</span>
+            </div>
+          </div>
+          <!-- Image 8 -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-purple-200 transform hover:scale-105 transition-transform duration-300 aspect-w-4 aspect-h-3"
+          >
+            <img
+              src="assets/foto8.jpg"
+              alt="Nosotros 8"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/400x300/dda0dd/ffffff?text=Error+Foto+8'; console.error('Error al cargar foto8.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-purple-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 8</span>
+            </div>
+          </div>
+          <!-- Image 9 - Spans 2 columns on medium screens and up -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-pink-200 transform hover:scale-105 transition-transform duration-300 md:col-span-2 aspect-w-16 aspect-h-9"
+          >
+            <img
+              src="assets/foto9.jpg"
+              alt="Nosotros 9"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/600x337/ffb6c1/ffffff?text=Error+Foto+9'; console.error('Error al cargar foto9.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-pink-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 9</span>
+            </div>
+          </div>
+          <!-- Image 10 -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-purple-200 transform hover:scale-105 transition-transform duration-300 aspect-w-4 aspect-h-3"
+          >
+            <img
+              src="assets/foto10.jpg"
+              alt="Nosotros 10"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/400x300/dda0dd/ffffff?text=Error+Foto+10'; console.error('Error al cargar foto10.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-purple-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 10</span>
+            </div>
+          </div>
+          <!-- Image 11 -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-pink-200 transform hover:scale-105 transition-transform duration-300 aspect-w-4 aspect-h-3"
+          >
+            <img
+              src="assets/foto11.jpg"
+              alt="Nosotros 11"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/400x300/ffb6c1/ffffff?text=Error+Foto+11'; console.error('Error al cargar foto11.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-pink-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 11</span>
+            </div>
+          </div>
+          <!-- Image 12 -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-purple-200 transform hover:scale-105 transition-transform duration-300 aspect-w-4 aspect-h-3"
+          >
+            <img
+              src="assets/foto12.jpg"
+              alt="Nosotros 12"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/400x300/dda0dd/ffffff?text=Error+Foto+12'; console.error('Error al cargar foto12.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-purple-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 12</span>
+            </div>
+          </div>
+          <!-- Image 13 - Spans 2 columns on medium screens and up -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-pink-200 transform hover:scale-105 transition-transform duration-300 md:col-span-2 aspect-w-16 aspect-h-9"
+          >
+            <img
+              src="assets/foto13.jpg"
+              alt="Nosotros 13"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/600x337/ffb6c1/ffffff?text=Error+Foto+13'; console.error('Error al cargar foto13.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-pink-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 13</span>
+            </div>
+          </div>
+          <!-- Image 14 -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-purple-200 transform hover:scale-105 transition-transform duration-300 aspect-w-4 aspect-h-3"
+          >
+            <img
+              src="assets/foto14.jpg"
+              alt="Nosotros 14"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/400x300/dda0dd/ffffff?text=Error+Foto+14'; console.error('Error al cargar foto14.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-purple-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 14</span>
+            </div>
+          </div>
+          <!-- Image 15 -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-pink-200 transform hover:scale-105 transition-transform duration-300 aspect-w-4 aspect-h-3"
+          >
+            <img
+              src="assets/foto15.jpg"
+              alt="Nosotros 15"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/400x300/ffb6c1/ffffff?text=Error+Foto+15'; console.error('Error al cargar foto15.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-pink-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 15</span>
+            </div>
+          </div>
+          <!-- Image 16 -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-purple-200 transform hover:scale-105 transition-transform duration-300 aspect-w-4 aspect-h-3"
+          >
+            <img
+              src="assets/foto16.jpg"
+              alt="Nosotros 16"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/400x300/dda0dd/ffffff?text=Error+Foto+16'; console.error('Error al cargar foto16.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-purple-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 16</span>
+            </div>
+          </div>
+          <!-- Image 17 -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-pink-200 transform hover:scale-105 transition-transform duration-300 aspect-w-4 aspect-h-3"
+          >
+            <img
+              src="assets/foto17.jpg"
+              alt="Nosotros 17"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/400x300/ffb6c1/ffffff?text=Error+Foto+17'; console.error('Error al cargar foto17.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-pink-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 17</span>
+            </div>
+          </div>
+          <!-- Image 18 -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-purple-200 transform hover:scale-105 transition-transform duration-300 aspect-w-4 aspect-h-3"
+          >
+            <img
+              src="assets/foto18.jpg"
+              alt="Nosotros 18"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/400x300/dda0dd/ffffff?text=Error+Foto+18'; console.error('Error al cargar foto18.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-purple-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 18</span>
+            </div>
+          </div>
+          <!-- Image 19 - Spans 2 columns on medium screens and up -->
+          <div
+            class="relative group rounded-2xl overflow-hidden shadow-lg border-2 border-pink-200 transform hover:scale-105 transition-transform duration-300 md:col-span-2 aspect-w-16 aspect-h-9"
+          >
+            <img
+              src="assets/foto19.jpg"
+              alt="Nosotros 19"
+              class="w-full h-full object-cover rounded-xl border-2 border-transparent"
+              onerror="this.onerror=null;this.src='https://placehold.co/600x337/ffb6c1/ffffff?text=Error+Foto+19'; console.error('Error al cargar foto19.jpg');"
+            />
+            <div
+              class="absolute inset-0 bg-pink-500 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="text-white text-xl font-bold">Recuerdo 19</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Letter Modal -->
+    <div
+      id="letterModal"
+      class="fixed inset-0 flex items-center justify-center z-50 hidden modal-overlay p-4"
+    >
+      <div
+        class="bg-white rounded-3xl shadow-2xl p-8 max-w-xl w-full relative border-4 border-pink-400 transform scale-95 opacity-0 transition-all duration-300 ease-out"
+        id="modalContent"
+      >
+        <button
+          id="closeModalBtn"
+          class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl"
+        >
+          <i class="fas fa-times-circle"></i>
+        </button>
+        <h3 class="text-4xl font-pacifico text-pink-600 mb-6 text-center">
+          Mi bubucita ❤️,
+        </h3>
+        <div
+          class="text-lg text-gray-700 leading-relaxed custom-scrollbar max-h-96 overflow-y-auto pr-4"
+        >
+          <p class="mb-4">
+            Lamento mucho por lo que estamos pasando, me mentiste y depreciaste
+            todo el esfuerzo y amor que he puesto en ti y por eso me siento mal.
+            Sin embargo, quiero que sepas que a pesar de todo, mi amor por ti no
+            ha cambiado.
+          </p>
+          <p class="mb-4">
+            Cada recuerdo que hemos construido juntos sigue vivo en mi corazón,
+            tan latente y precioso como el primer día. Esos momentos, esas
+            risas, esas miradas, son tesoros que guardo y que me recuerdan lo
+            especial que eres para mí.
+          </p>
+          <p class="mb-4">
+            Contigo he aprendido mucho, y aunque los caminos a veces tengan
+            obstáculos, mi deseo es que sigamos construyendo más recuerdos, más
+            momentos felices, y que nuestro amor se fortalezca con cada
+            experiencia.
+          </p>
+          <p class="mb-4">
+            Eres una parte fundamental de mi vida, y no te he dejado de amar por
+            eso. Al contrario, mi cariño y mi esperanza en nosotros siguen
+            intactos aunque estoy herido, por eso no puedo expresarme con
+            palabras.
+          </p>
+          <p class="text-right mt-6 font-bold text-pink-700">
+            Con todo mi amor y mis recuerdos,
+          </p>
+          <p class="text-right font-bold text-pink-700 text-2xl">Tu Gordito</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Get DOM elements
+      const initialScreen = document.getElementById("initial-screen");
+      const nameInput = document.getElementById("nameInput");
+      const enterBtn = document.getElementById("enterBtn");
+      const errorMessage = document.getElementById("errorMessage");
+      const mainContent = document.getElementById("main-content");
+      const openLetterBtn = document.getElementById("openLetterBtn");
+      const letterModal = document.getElementById("letterModal");
+      const closeModalBtn = document.getElementById("closeModalBtn");
+      const modalContent = document.getElementById("modalContent");
+      const fallingHeartsContainer = document.getElementById(
+        "fallingHeartsContainer"
+      );
+      const backgroundMusic = document.getElementById("backgroundMusic"); // Get the audio element
+
+      // --- Initial Screen Logic ---
+      enterBtn.addEventListener("click", () => {
+        // Trim whitespace and convert to lowercase for case-insensitive comparison
+        if (nameInput.value.trim().toLowerCase() === "nelsy") {
+          errorMessage.classList.add("hidden"); // Hide error message
+          // Add classes for a smooth transition out
+          initialScreen.classList.add("opacity-0", "scale-90");
+          setTimeout(() => {
+            initialScreen.classList.add("hidden"); // Hide after transition
+            mainContent.classList.remove("hidden"); // Show main content
+            mainContent.classList.add("flex"); // Ensure flex display
+            // Add classes for a smooth transition in
+            mainContent.classList.add("opacity-100", "scale-100");
+            startFallingHearts(); // Start the falling hearts animation
+            backgroundMusic.play().catch((error) => {
+              // Play music and catch potential errors (e.g., autoplay policy)
+              console.log("Error al intentar reproducir la música:", error);
+              // You might want to show a message to the user here if autoplay fails
+            });
+          }, 700); // Match transition duration
+        } else {
+          errorMessage.classList.remove("hidden"); // Show error message
+          nameInput.value = ""; // Clear input
+        }
+      });
+
+      // --- Letter Modal Logic ---
+      openLetterBtn.addEventListener("click", () => {
+        letterModal.classList.remove("hidden");
+        // Animate modal in
+        setTimeout(() => {
+          modalContent.classList.remove("opacity-0", "scale-95");
+          modalContent.classList.add("opacity-100", "scale-100");
+        }, 10); // Small delay to allow display to update
+      });
+
+      closeModalBtn.addEventListener("click", () => {
+        // Animate modal out
+        modalContent.classList.remove("opacity-100", "scale-100");
+        modalContent.classList.add("opacity-0", "scale-95");
+        setTimeout(() => {
+          letterModal.classList.add("hidden"); // Hide after transition
+        }, 300); // Match transition duration
+      });
+
+      // Close modal if clicking outside the content
+      letterModal.addEventListener("click", (event) => {
+        if (event.target === letterModal) {
+          closeModalBtn.click(); // Trigger close button click
+        }
+      });
+
+      // --- Falling Hearts Animation ---
+      function startFallingHearts() {
+        const numHearts = 30; // Number of hearts to animate
+        const heartInterval = 500; // Milliseconds between new hearts
+
+        for (let i = 0; i < numHearts; i++) {
+          setTimeout(() => {
+            createFallingHeart();
+          }, i * heartInterval);
+        }
+
+        // Continuously create hearts after the initial batch
+        setInterval(createFallingHeart, numHearts * heartInterval);
+      }
+
+      function createFallingHeart() {
+        const heart = document.createElement("div");
+        heart.classList.add("falling-heart");
+        heart.innerHTML = "❤️"; // Unicode heart emoji
+
+        // Random starting position (x-axis)
+        const startX = Math.random() * window.innerWidth;
+        heart.style.left = `${startX}px`;
+
+        // Random animation duration for variety
+        const duration = Math.random() * 5 + 5; // 5 to 10 seconds
+        heart.style.animationDuration = `${duration}s`;
+
+        // Random horizontal movement offset (for a more natural fall)
+        const xOffset = (Math.random() - 0.5) * 200; // -100px to 100px
+        heart.style.setProperty("--x-offset", `${xOffset}px`);
+
+        // Random initial opacity
+        heart.style.opacity = Math.random() * 0.5 + 0.5; // 0.5 to 1
+
+        fallingHeartsContainer.appendChild(heart);
+
+        // Remove heart after it falls off screen to prevent memory leak
+        heart.addEventListener("animationend", () => {
+          heart.remove();
+        });
+      }
+
+      // Initial check for screen size to adjust heart size (optional, but good for responsiveness)
+      window.addEventListener("resize", () => {
+        // You can add logic here if you want to dynamically adjust font sizes or other elements
+        // based on window size, though Tailwind handles most of it.
+      });
+
+      // Ensure the initial screen is visible on load
+      document.addEventListener("DOMContentLoaded", () => {
+        initialScreen.classList.remove("hidden");
+        initialScreen.classList.add("flex");
+      });
+    </script>
+  </body>
+</html>
